@@ -1,13 +1,30 @@
 /datum/objective/maniac
-	name = "WAKE UP"
+	name = "SUMMON HIM"
 	explanation_text = "FOLLOWING my HEART shall be the WHOLE of the law."
 	flavor = "Dream"
+
+/datum/objective/kill
+	name = "KILLKILLKILLKILL"
+	explanation_text = "KILLEVERYONE"
+	flavor = "Dream"
+
+/datum/antagonist/graggars_slave
+	name = "Graggar's slave"
+	roundend_category = "maniacs"
+	antagpanel_category = "Maniac"
+	antag_memory = "<b>SUDDENLY, I HAVE AN INSTATIABLE URGE TO KILL EVERYONE I SEE</b>"
+
+/datum/antagonist/graggars_slave/on_gain()
+	. = ..()
+	var/datum/objective/kill/objective = new()
+	objectives += objective
+	to_chat(owner.current,span_danger("KILLKILLKILL"))
 
 /datum/antagonist/maniac
 	name = "Maniac"
 	roundend_category = "maniacs"
 	antagpanel_category = "Maniac"
-	antag_memory = "<b>Recently I've been visited by a lot of VISIONS. They're all about another WORLD, ANOTHER life. I will do EVERYTHING to know the TRUTH, and return to the REAL world.</b>"
+	antag_memory = "<b>Recently I've been visited by a lot of VISIONS. They're all about summoning HIM. I will do EVERYTHING to know the MAKE IT HAPPEN.</b>"
 	job_rank = ROLE_MANIAC
 	antag_hud_type = ANTAG_HUD_MANIAC
 	antag_hud_name = "generic_villain"
@@ -218,7 +235,7 @@ GLOBAL_VAR_INIT(maniac_highlander, 0) // THERE CAN ONLY BE ONE!
 	if(GLOB.maniac_highlander) // another Maniac has TRIUMPHED before we could
 		if(src.owner && src.owner.current)
 			var/straggler = src.owner.current
-			to_chat(straggler, span_danger("IT'S NO USE! I CAN'T WAKE UP!"))
+			to_chat(straggler, span_danger("IT'S NO USE! I CAN'T SUMMON HIM!"))
 		return
 	GLOB.maniac_highlander = 1
 	STOP_PROCESSING(SSobj, src)
@@ -241,45 +258,60 @@ GLOBAL_VAR_INIT(maniac_highlander, 0) // THERE CAN ONLY BE ONE!
 	// 		continue
 	// 	SEND_SOUND(connected_player, sound(null))
 	// 	SEND_SOUND(connected_player, 'sound/villain/dreamer_win.ogg')
-	var/mob/living/carbon/human/trey_liam = spawn_trey_liam()
-	if(trey_liam)
-		owner.adjust_triumphs(4) // Adjust triumphs here instead of at roundend
-		owner.transfer_to(trey_liam)
-		//Explodie all our wonders
-		for(var/obj/structure/wonder/wondie as anything in wonders_made)
-			if(istype(wondie))
-				explosion(wondie, 8, 16, 32, 64)
-		var/obj/item/organ/brain/brain = dreamer.getorganslot(ORGAN_SLOT_BRAIN)
-		var/obj/item/bodypart/head/head = dreamer.get_bodypart(BODY_ZONE_HEAD)
-		if(head)
-			head.dismember(BURN)
-			if(!QDELETED(head))
-				qdel(head)
-		if(brain)
-			qdel(brain)
-		cull_competitors(trey_liam)
-		SEND_SOUND(trey_liam, 'sound/villain/dreamer_win.ogg')
-		trey_liam.SetSleeping(25 SECONDS)
-		trey_liam.add_stress(/datum/stressevent/maniac_woke_up)
-		sleep(1.5 SECONDS)
-		to_chat(trey_liam, span_deadsay("<span class='reallybig'>... WHERE AM I? ...</span>"))
-		sleep(1.5 SECONDS)
-		var/static/list/slop_lore = list(
-			span_deadsay("... Rockhill? Vanderlin? No ... They don't exist ..."),
-			span_deadsay("... My name is Trey. Trey Liam, Scientific Overseer ..."),
-			span_deadsay("... I'm on the Aeon, a self sustaining ship, used to preserve what remains of humanity ..."),
-			span_deadsay("... Launched into the stars, preserving their memories ... Their personalities ..."),
-			span_deadsay("... Keeps them alive in vessels, oblivious to the catastrophe ..."),
-			span_deadsay("... There is no hope left. Only the program lets me live through the avatars ..."),
-			span_deadsay("... What have I done?! ..."),
-		)
-		for(var/slop in slop_lore)
-			to_chat(trey_liam, slop)
-			sleep(3 SECONDS)
-		to_chat(trey_liam, span_big(span_deadsay("I have to go back, I have to go back, I have to go back to Vanderlin.")))
-	else
-		INVOKE_ASYNC(src, PROC_REF(cant_wake_up), dreamer)
-		cull_competitors(dreamer)
+	// var/mob/living/carbon/human/trey_liam = spawn_trey_liam()
+	// if(trey_liam)
+	// 	owner.adjust_triumphs(4) // Adjust triumphs here instead of at roundend
+	// 	owner.transfer_to(trey_liam)
+	// 	//Explodie all our wonders
+	// 	for(var/obj/structure/wonder/wondie as anything in wonders_made)
+	// 		if(istype(wondie))
+	// 			explosion(wondie, 8, 16, 32, 64)
+	// 	var/obj/item/organ/brain/brain = dreamer.getorganslot(ORGAN_SLOT_BRAIN)
+	// 	var/obj/item/bodypart/head/head = dreamer.get_bodypart(BODY_ZONE_HEAD)
+	// 	if(head)
+	// 		head.dismember(BURN)
+	// 		if(!QDELETED(head))
+	// 			qdel(head)
+	// 	if(brain)
+	// 		qdel(brain)
+	// 	cull_competitors(trey_liam)
+	// 	SEND_SOUND(trey_liam, 'sound/villain/dreamer_win.ogg')
+	// 	trey_liam.SetSleeping(25 SECONDS)
+	// 	trey_liam.add_stress(/datum/stressevent/maniac_woke_up)
+	// 	sleep(1.5 SECONDS)
+	// 	to_chat(trey_liam, span_deadsay("<span class='reallybig'>... WHERE AM I? ...</span>"))
+	// 	sleep(1.5 SECONDS)
+	// 	var/static/list/slop_lore = list(
+	// 		span_deadsay("... Rockhill? Vanderlin? No ... They don't exist ..."),
+	// 		span_deadsay("... My name is Trey. Trey Liam, Scientific Overseer ..."),
+	// 		span_deadsay("... I'm on the Aeon, a self sustaining ship, used to preserve what remains of humanity ..."),
+	// 		span_deadsay("... Launched into the stars, preserving their memories ... Their personalities ..."),
+	// 		span_deadsay("... Keeps them alive in vessels, oblivious to the catastrophe ..."),
+	// 		span_deadsay("... There is no hope left. Only the program lets me live through the avatars ..."),
+	// 		span_deadsay("... What have I done?! ..."),
+	// 	)
+	// 	for(var/slop in slop_lore)
+	// 		to_chat(trey_liam, slop)
+	// 		sleep(3 SECONDS)
+	// 	to_chat(trey_liam, span_big(span_deadsay("I have to go back, I have to go back, I have to go back to Vanderlin.")))
+	// else
+	// 	INVOKE_ASYNC(src, PROC_REF(cant_wake_up), dreamer)
+	// 	cull_competitors(dreamer)
+
+
+	for(var/obj/structure/wonder/wondie as anything in wonders_made)
+		if(istype(wondie))
+			explosion(wondie, 8, 16, 32, 64)
+
+	cull_competitors(owner)
+	SEND_SOUND(owner, 'sound/villain/dreamer_win.ogg')
+	for(var/mob/living/carbon/victim in GLOB.carbon_list)
+		var/datum/mind/mind = victim.mind
+		if(mind)
+			var/datum/antagonist/graggars_slave/antag = new()
+			mind.add_antag_datum(antag)
+			owner.current.add_client_colour(/datum/client_colour/glass_colour/red)
+
 	// sleep(15 SECONDS)
 	// to_chat(world, span_deadsay("<span class='reallybig'>The Maniac has TRIUMPHED!</span>"))
 	// SSticker.declare_completion()
@@ -287,10 +319,10 @@ GLOBAL_VAR_INIT(maniac_highlander, 0) // THERE CAN ONLY BE ONE!
 /datum/antagonist/maniac/proc/cant_wake_up(mob/living/dreamer)
 	if(!iscarbon(dreamer))
 		return
-	to_chat(dreamer, span_deadsay("<span class='reallybig'>I CAN'T WAKE UP.</span>"))
+	to_chat(dreamer, span_deadsay("<span class='reallybig'>He is disappointed.</span>"))
 	sleep(2 SECONDS)
 	for(var/i in 1 to 10)
-		to_chat(dreamer, span_deadsay("<span class='reallybig'>ICANTWAKEUP</span>"))
+		to_chat(dreamer, span_deadsay("<span class='reallybig'>OHGOD</span>"))
 		sleep(0.5 SECONDS)
 	var/obj/item/organ/brain/brain = dreamer.getorganslot(ORGAN_SLOT_BRAIN)
 	var/obj/item/bodypart/head/head = dreamer.get_bodypart(BODY_ZONE_HEAD)
